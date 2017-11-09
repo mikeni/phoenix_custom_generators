@@ -24,7 +24,12 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
   for more information on attributes and namespaced resources.
   """
   def run(args) do
-    switches = [binary_id: :boolean, model: :boolean]
+    switches = [
+      binary_id: :boolean, 
+      model: :boolean, 
+      ex_machina: :string, 
+      ecto_calendar_types: :boolean
+    ]
 
     {opts, parsed, _} = OptionParser.parse(args, switches: switches)
     [singular, plural | attrs] = validate_args!(parsed)
@@ -36,9 +41,18 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
     binding = Mix.Phoenix.inflect(singular)
     path    = binding[:path]
     route   = String.split(path, "/") |> Enum.drop(-1) |> Kernel.++([plural]) |> Enum.join("/")
-    binding = binding ++ [plural: plural, route: route,
-                          sample_id: sample_id(opts),
-                          attrs: attrs, params: Mix.Phoenix.params(attrs)]
+    binding = binding ++ [
+      plural: plural, 
+      route: route,
+      sample_id: sample_id(opts),
+      attrs: attrs, 
+      params: Mix.Phoenix.params(attrs),
+      ex_machina: Keyword.get(opts, :ex_machina, false),
+      ecto_calendar_types: Keyword.get(opts, :ecto_calendar_types, false)
+    ]
+
+IO.inspect(opts, limit: :infinity)
+IO.inspect(binding, limit: :infinity)
 
     Mix.Phoenix.check_module_name_availability!(binding[:module] <> "Controller")
     Mix.Phoenix.check_module_name_availability!(binding[:module] <> "View")
@@ -57,9 +71,8 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
 
         resources "/#{route}", #{binding[:scoped]}Controller, except: [:new, :edit]
     """
-
     if opts[:model] != false do
-      Mix.Task.run "phoenix.gen.model", ["--instructions", instructions|args]
+      Mix.Task.run "phoenix_custom_generators.gen.model", ["--instructions", instructions|args]
     else
       Mix.shell.info instructions
     end
@@ -107,6 +120,6 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
   end
 
   defp paths do
-    [".", :phoenix]
+    [".", :phoenix_custom_generators]
   end
 end

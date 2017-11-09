@@ -83,7 +83,13 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Model do
   configuration or `--migration` to force generation of the migration.
   """
   def run(args) do
-    switches = [migration: :boolean, binary_id: :boolean, instructions: :string]
+    switches = [
+      migration: :boolean, 
+      binary_id: :boolean, 
+      instructions: :string, 
+      ex_machina: :string, 
+      ecto_calendar_types: :boolean
+    ]
 
     {opts, parsed, _} = OptionParser.parse(args, switches: switches)
     [singular, plural | attrs] = validate_args!(parsed)
@@ -101,7 +107,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Model do
     {assocs, attrs} = partition_attrs_and_assocs(attrs)
 
     binding = binding ++
-              [attrs: attrs, plural: plural, types: types(attrs), uniques: uniques,
+              [attrs: attrs, plural: plural, types: types(attrs, opts), uniques: uniques,
                assocs: assocs(assocs), indexes: indexes(plural, assocs, uniques),
                schema_defaults: schema_defaults(attrs), binary_id: opts[:binary_id],
                migration_defaults: migration_defaults(attrs), params: params]
@@ -199,10 +205,10 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Model do
   defp pad(i) when i < 10, do: << ?0, ?0 + i >>
   defp pad(i), do: to_string(i)
 
-  defp types(attrs) do
+  defp types(attrs, opts) do
     Enum.into attrs, %{}, fn
-      {k, {c, v}}       -> {k, {c, value_to_type(v)}}
-      {k, v}            -> {k, value_to_type(v)}
+      {k, {c, v}}       -> {k, {c, value_to_type(v, opts)}}
+      {k, v}            -> {k, value_to_type(v, opts)}
     end
   end
 
@@ -220,12 +226,30 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Model do
     end
   end
 
-  defp value_to_type(:text), do: :string
-  defp value_to_type(:uuid), do: Ecto.UUID
-  defp value_to_type(:date), do: Ecto.Date
-  defp value_to_type(:time), do: Ecto.Time
-  defp value_to_type(:datetime), do: Ecto.DateTime
-  defp value_to_type(v) do
+  defp value_to_type(:text, _opts), do: :string
+  defp value_to_type(:uuid, _opts), do: Ecto.UUID
+  defp value_to_type(:date, opts) do
+    if Keyword.get(opts, :ecto_calendar_types, false) do
+      Ecto.Date
+    else
+      :date
+    end
+  end
+  defp value_to_type(:time, opts) do
+    if Keyword.get(opts, :ecto_calendar_types, false) do
+      Ecto.Time
+    else
+      :time
+    end
+  end
+  defp value_to_type(:datetime, opts) do
+    if Keyword.get(opts, :ecto_calendar_types, false) do
+      Ecto.DateTime
+    else
+      :utc_datetime
+    end
+  end
+  defp value_to_type(v, _opts) do
     if Code.ensure_loaded?(Ecto.Type) and not Ecto.Type.primitive?(v) do
       Mix.raise "Unknown type `#{v}` given to generator"
     else
@@ -234,6 +258,6 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Model do
   end
 
   defp paths do
-    [".", :phoenix]
+    [".", :phoenix_custom_generators]
   end
 end
