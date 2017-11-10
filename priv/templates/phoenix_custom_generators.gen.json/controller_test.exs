@@ -4,9 +4,15 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
   alias <%= inspect context.module %>
   alias <%= inspect schema.module %>
 
-  @create_attrs <%= inspect schema.params.create %>
-  @update_attrs <%= inspect schema.params.update %>
-  @invalid_attrs <%= inspect for {key, _} <- schema.params.create, into: %{}, do: {key, nil} %>
+  @create_attrs %{<%= for {k, v} <- schema.params.create do %>
+    <%= k %>: <%= inspect v %>,<% end %>
+  }
+  @update_attrs %{<%= for {k, v} <- schema.params.update do %>
+    <%= k %>: <%= inspect v %>,<% end %>
+  }
+  @invalid_attrs %{<%= for {k, _} <- schema.params.create do %>
+    <%= k %>: nil,<% end %>
+  }
 
   def fixture(:<%= schema.singular %>) do
     {:ok, <%= schema.singular %>} = <%= inspect context.alias %>.create_<%= schema.singular %>(@create_attrs)

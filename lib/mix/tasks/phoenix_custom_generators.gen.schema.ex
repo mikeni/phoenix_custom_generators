@@ -124,11 +124,11 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Schema do
   @doc false
   def copy_new_files(%Schema{context_app: ctx_app} = schema, paths, binding) do
     files = files_to_be_generated(schema)
-    Mix.PhoenixCustomGenerators.copy_from(paths,"priv/templates/phx.gen.schema", binding, files)
+    Mix.PhoenixCustomGenerators.copy_from(paths,"priv/templates/phoenix_custom_generators.gen.schema", binding, files)
 
     if schema.migration? do
       migration_path = Mix.PhoenixCustomGenerators.context_app_path(ctx_app, "priv/repo/migrations/#{timestamp()}_create_#{schema.table}.exs")
-      Mix.PhoenixCustomGenerators.copy_from paths, "priv/templates/phx.gen.schema", binding, [
+      Mix.PhoenixCustomGenerators.copy_from paths, "priv/templates/phoenix_custom_generators.gen.schema", binding, [
         {:eex, "migration.exs", migration_path},
       ]
     end

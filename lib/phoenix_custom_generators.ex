@@ -45,7 +45,6 @@ defmodule Mix.PhoenixCustomGenerators do
   """
   def copy_from(apps, source_dir, binding, mapping) when is_list(mapping) do
     roots = Enum.map(apps, &to_app_source(&1, source_dir))
-
     for {format, source_file_path, target} <- mapping do
       source =
         Enum.find_value(roots, fn root ->

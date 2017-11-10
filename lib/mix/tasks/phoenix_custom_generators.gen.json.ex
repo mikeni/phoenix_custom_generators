@@ -132,6 +132,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
   def files_to_be_generated(%Context{schema: schema, context_app: context_app}) do
     web_prefix = Mix.PhoenixCustomGenerators.web_path(context_app)
     test_prefix = Mix.PhoenixCustomGenerators.web_test_path(context_app)
+    
     web_path = to_string(schema.web_path)
 
     [

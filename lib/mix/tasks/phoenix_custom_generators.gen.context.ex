@@ -140,11 +140,11 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Context do
 
   defp inject_schema_access(%Context{file: file} = context, paths, binding) do
     unless Context.pre_existing?(context) do
-      Mix.Generator.create_file(file, Mix.PhoenixCustomGenerators.eval_from(paths, "priv/templates/phx.gen.context/context.ex", binding))
+      Mix.Generator.create_file(file, Mix.PhoenixCustomGenerators.eval_from(paths, "priv/templates/phoenix_custom_generators.gen.context/context.ex", binding))
     end
 
     paths
-    |> Mix.PhoenixCustomGenerators.eval_from("priv/templates/phx.gen.context/#{schema_access_template(context)}", binding)
+    |> Mix.PhoenixCustomGenerators.eval_from("priv/templates/phoenix_custom_generators.gen.context/#{schema_access_template(context)}", binding)
     |> inject_eex_before_final_end(file, binding)
   end
 
@@ -154,11 +154,11 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Context do
 
   defp inject_tests(%Context{test_file: test_file} = context, paths, binding) do
     unless Context.pre_existing_tests?(context) do
-      Mix.Generator.create_file(test_file, Mix.PhoenixCustomGenerators.eval_from(paths, "priv/templates/phx.gen.context/context_test.exs", binding))
+      Mix.Generator.create_file(test_file, Mix.PhoenixCustomGenerators.eval_from(paths, "priv/templates/phoenix_custom_generators.gen.context/context_test.exs", binding))
     end
 
     paths
-    |> Mix.PhoenixCustomGenerators.eval_from("priv/templates/phx.gen.context/test_cases.exs", binding)
+    |> Mix.PhoenixCustomGenerators.eval_from("priv/templates/phoenix_custom_generators.gen.context/test_cases.exs", binding)
     |> inject_eex_before_final_end(test_file, binding)
   end
 
@@ -220,14 +220,15 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Context do
     Mix.raise """
     #{msg}
 
-    mix phx.gen.html, phx.gen.json and phx.gen.context expect a
+    mix phoenix_custom_generators.gen.html, phoenix_custom_generators.gen.json 
+    and phoenix_custom_generators.gen.context expect a
     context module name, followed by singular and plural names of
     the generated resource, ending with any number of attributes.
     For example:
 
-        mix phx.gen.html Accounts User users name:string
-        mix phx.gen.json Accounts User users name:string
-        mix phx.gen.context Accounts User users name:string
+        mix phoenix_custom_generators.gen.html Accounts User users name:string
+        mix phoenix_custom_generators.gen.json Accounts User users name:string
+        mix phoenix_custom_generators.gen.context Accounts User users name:string
 
     The context serves as the API boundary for the given resource.
     Multiple resources may belong to a context and a resource may be
