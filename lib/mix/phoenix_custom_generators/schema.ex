@@ -210,7 +210,7 @@ defmodule Mix.PhoenixCustomGenerators.Schema do
         :date           -> "2010-04-17"
         :time           -> "14:00:00.000000"
         :uuid           -> "7488a646-e31f-11e4-aace-600308960662"
-        :utc_datetime   -> "2010-04-17T14:00:00.000000"
+        :utc_datetime   -> "2010-04-17T14:00:00.000000Z"
         :naive_datetime -> "2010-04-17T14:00:00.000000"
         _               -> "some #{key}"
     end
@@ -245,7 +245,7 @@ defmodule Mix.PhoenixCustomGenerators.Schema do
         :time           -> "15:01:01.000000"
         :uuid           -> "7488a646-e31f-11e4-aace-600308960668"
         :utc_datetime   -> "2011-05-18T15:01:01.000000Z"
-        :naive_datetime -> "2011-05-18T15:01:01.000000Z"
+        :naive_datetime -> "2011-05-18T15:01:01.000000"
         _               -> "some updated #{key}"
     end
   end
