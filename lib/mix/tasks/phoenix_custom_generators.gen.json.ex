@@ -1,10 +1,10 @@
-defmodule Mix.Tasks.Phx.Gen.Html do
-  @shortdoc "Generates controller, views, and context for an HTML resource"
+defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
+  @shortdoc "Generates controller, views, and context for a JSON resource"
 
   @moduledoc """
-  Generates controller, views, and context for an HTML resource.
+  Generates controller, views, and context for an JSON resource.
 
-      mix phx.gen.html Accounts User users name:string age:integer
+      mix phx.gen.json Accounts User users name:string age:integer
 
   The first argument is the context module followed by the schema module
   and its plural name (used as the schema table name).
@@ -24,7 +24,6 @@ defmodule Mix.Tasks.Phx.Gen.Html do
     * a schema in lib/app/accounts/user.ex, with an `users` table
     * a view in lib/app_web/views/user_view.ex
     * a controller in lib/app_web/controllers/user_controller.ex
-    * default CRUD templates in lib/app_web/templates/user
 
   A migration file for the repository and test files for the context and
   controller features will also be generated.
@@ -58,7 +57,7 @@ defmodule Mix.Tasks.Phx.Gen.Html do
 
   ## Generating without a schema or context file
 
-  In some cases, you may wish to boostrap HTML templates, controllers, and
+  In some cases, you may wish to bootstrap JSON views, controllers, and
   controller tests, but leave internal implementation of the context or schema
   to yourself. You can use the `--no-context` and `--no-schema` flags for
   file generation control.
@@ -69,7 +68,7 @@ defmodule Mix.Tasks.Phx.Gen.Html do
   the plural name provided for the resource. To customize this value,
   a `--table` option may be provided. For example:
 
-      mix phx.gen.html Accounts User users --table cms_users
+      mix phx.gen.json Accounts User users --table cms_users
 
   ## binary_id
 
@@ -93,19 +92,21 @@ defmodule Mix.Tasks.Phx.Gen.Html do
   Read the documentation for `phx.gen.schema` for more information on
   attributes.
   """
+
   use Mix.Task
 
-  alias Mix.Phoenix.{Context, Schema}
-  alias Mix.Tasks.Phx.Gen
+  alias Mix.PhoenixCustomGenerators.Context
+  alias Mix.Tasks.PhoenixCustomGenerators.Gen
 
   @doc false
   def run(args) do
     if Mix.Project.umbrella? do
-      Mix.raise "mix phx.gen.html can only be run inside an application directory"
+      Mix.raise "mix phoenix_custom_generators.gen.json can only be run inside an application directory"
     end
+
     {context, schema} = Gen.Context.build(args)
-    binding = [context: context, schema: schema, inputs: inputs(schema)]
-    paths = Mix.Phoenix.generator_paths()
+    binding = [context: context, schema: schema]
+    paths = Mix.PhoenixCustomGenerators.generator_paths()
 
     prompt_for_conflicts(context)
 
@@ -118,7 +119,7 @@ defmodule Mix.Tasks.Phx.Gen.Html do
     context
     |> files_to_be_generated()
     |> Kernel.++(context_files(context))
-    |> Mix.Phoenix.prompt_for_conflicts()
+    |> Mix.PhoenixCustomGenerators.prompt_for_conflicts()
   end
   defp context_files(%Context{generate?: true} = context) do
     Gen.Context.files_to_be_generated(context)
@@ -129,27 +130,25 @@ defmodule Mix.Tasks.Phx.Gen.Html do
 
   @doc false
   def files_to_be_generated(%Context{schema: schema, context_app: context_app}) do
-    web_prefix = Mix.Phoenix.web_path(context_app)
-    test_prefix = Mix.Phoenix.web_test_path(context_app)
+    web_prefix = Mix.PhoenixCustomGenerators.web_path(context_app)
+    test_prefix = Mix.PhoenixCustomGenerators.web_test_path(context_app)
     web_path = to_string(schema.web_path)
 
     [
-      {:eex, "controller.ex",       Path.join([web_prefix, "controllers", web_path, "#{schema.singular}_controller.ex"])},
-      {:eex, "edit.html.eex",       Path.join([web_prefix, "templates", web_path, schema.singular, "edit.html.eex"])},
-      {:eex, "form.html.eex",       Path.join([web_prefix, "templates", web_path, schema.singular, "form.html.eex"])},
-      {:eex, "index.html.eex",      Path.join([web_prefix, "templates", web_path, schema.singular, "index.html.eex"])},
-      {:eex, "new.html.eex",        Path.join([web_prefix, "templates", web_path, schema.singular, "new.html.eex"])},
-      {:eex, "show.html.eex",       Path.join([web_prefix, "templates", web_path, schema.singular, "show.html.eex"])},
-      {:eex, "view.ex",             Path.join([web_prefix, "views", web_path, "#{schema.singular}_view.ex"])},
-      {:eex, "controller_test.exs", Path.join([test_prefix,"controllers", web_path, "#{schema.singular}_controller_test.exs"])},
+      {:eex,     "controller.ex",          Path.join([web_prefix, "controllers", web_path, "#{schema.singular}_controller.ex"])},
+      {:eex,     "view.ex",                Path.join([web_prefix, "views", web_path, "#{schema.singular}_view.ex"])},
+      {:eex,     "controller_test.exs",    Path.join([test_prefix, "controllers", web_path, "#{schema.singular}_controller_test.exs"])},
+      {:new_eex, "changeset_view.ex",      Path.join([web_prefix, "views/changeset_view.ex"])},
+      {:new_eex, "fallback_controller.ex", Path.join([web_prefix, "controllers/fallback_controller.ex"])},
     ]
   end
 
   @doc false
   def copy_new_files(%Context{} = context, paths, binding) do
     files = files_to_be_generated(context)
-    Mix.Phoenix.copy_from(paths, "priv/templates/phx.gen.html", binding, files)
+    Mix.PhoenixCustomGenerators.copy_from paths, "priv/templates/phoenix_custom_generators.gen.json", binding, files
     if context.generate?, do: Gen.Context.copy_new_files(context, paths, binding)
+
     context
   end
 
@@ -158,10 +157,10 @@ defmodule Mix.Tasks.Phx.Gen.Html do
     if schema.web_namespace do
       Mix.shell.info """
 
-      Add the resource to your #{schema.web_namespace} :browser scope in #{Mix.Phoenix.web_path(ctx_app)}/router.ex:
+      Add the resource to your #{schema.web_namespace} :api scope in #{Mix.PhoenixCustomGenerators.web_path(ctx_app)}/router.ex:
 
-          scope "/#{schema.web_path}", #{inspect Module.concat(context.web_module, schema.web_namespace)}, as: :#{schema.web_path} do
-            pipe_through :browser
+          scope "/#{schema.web_path}", #{inspect Module.concat(context.web_module, schema.web_namespace)} do
+            pipe_through :api
             ...
             resources "/#{schema.plural}", #{inspect schema.alias}Controller
           end
@@ -169,48 +168,11 @@ defmodule Mix.Tasks.Phx.Gen.Html do
     else
       Mix.shell.info """
 
-      Add the resource to your browser scope in #{Mix.Phoenix.web_path(ctx_app)}/router.ex:
+      Add the resource to your :api scope in #{Mix.PhoenixCustomGenerators.web_path(ctx_app)}/router.ex:
 
-          resources "/#{schema.plural}", #{inspect schema.alias}Controller
+          resources "/#{schema.plural}", #{inspect schema.alias}Controller, except: [:new, :edit]
       """
     end
     if context.generate?, do: Gen.Context.print_shell_instructions(context)
-  end
-
-  defp inputs(%Schema{} = schema) do
-    Enum.map(schema.attrs, fn
-      {_, {:array, _}} ->
-        {nil, nil, nil}
-      {_, {:references, _}} ->
-        {nil, nil, nil}
-      {key, :integer} ->
-        {label(key), ~s(<%= number_input f, #{inspect(key)}, class: "form-control" %>), error(key)}
-      {key, :float} ->
-        {label(key), ~s(<%= number_input f, #{inspect(key)}, step: "any", class: "form-control" %>), error(key)}
-      {key, :decimal} ->
-        {label(key), ~s(<%= number_input f, #{inspect(key)}, step: "any", class: "form-control" %>), error(key)}
-      {key, :boolean} ->
-        {label(key), ~s(<%= checkbox f, #{inspect(key)}, class: "checkbox" %>), error(key)}
-      {key, :text} ->
-        {label(key), ~s(<%= textarea f, #{inspect(key)}, class: "form-control" %>), error(key)}
-      {key, :date} ->
-        {label(key), ~s(<%= date_select f, #{inspect(key)}, class: "form-control" %>), error(key)}
-      {key, :time} ->
-        {label(key), ~s(<%= time_select f, #{inspect(key)}, class: "form-control" %>), error(key)}
-      {key, :utc_datetime} ->
-        {label(key), ~s(<%= datetime_select f, #{inspect(key)}, class: "form-control" %>), error(key)}
-      {key, :naive_datetime} ->
-        {label(key), ~s(<%= datetime_select f, #{inspect(key)}, class: "form-control" %>), error(key)}
-      {key, _}  ->
-        {label(key), ~s(<%= text_input f, #{inspect(key)}, class: "form-control" %>), error(key)}
-    end)
-  end
-
-  defp label(key) do
-    ~s(<%= label f, #{inspect(key)}, class: "control-label" %>)
-  end
-
-  defp error(field) do
-    ~s(<%= error_tag f, #{inspect(field)} %>)
   end
 end

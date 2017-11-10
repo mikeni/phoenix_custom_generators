@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Phx.Gen.Schema do
+defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Schema do
   @shortdoc "Generates an Ecto schema and migration file"
 
   @moduledoc """
@@ -26,7 +26,7 @@ defmodule Mix.Tasks.Phx.Gen.Schema do
 
   The following types are supported:
 
-  #{for attr <- Mix.Phoenix.Schema.valid_types(), do: "  * `#{inspect attr}`\n"}
+  #{for attr <- Mix.PhoenixCustomGenerators.Schema.valid_types(), do: "  * `#{inspect attr}`\n"}
     * `:datetime` - An alias for `:naive_datetime`
 
   The generator also supports references, which we will properly
@@ -79,7 +79,7 @@ defmodule Mix.Tasks.Phx.Gen.Schema do
   """
   use Mix.Task
 
-  alias Mix.Phoenix.Schema
+  alias Mix.PhoenixCustomGenerators.Schema
 
   @switches [migration: :boolean, binary_id: :boolean, table: :string,
              web: :string]
@@ -91,7 +91,7 @@ defmodule Mix.Tasks.Phx.Gen.Schema do
     end
 
     schema = build(args, [])
-    paths = Mix.Phoenix.generator_paths()
+    paths = Mix.PhoenixCustomGenerators.generator_paths()
 
     prompt_for_conflicts(schema)
 
@@ -103,7 +103,7 @@ defmodule Mix.Tasks.Phx.Gen.Schema do
   defp prompt_for_conflicts(schema) do
     schema
     |> files_to_be_generated()
-    |> Mix.Phoenix.prompt_for_conflicts()
+    |> Mix.PhoenixCustomGenerators.prompt_for_conflicts()
   end
 
   @doc false
@@ -124,11 +124,11 @@ defmodule Mix.Tasks.Phx.Gen.Schema do
   @doc false
   def copy_new_files(%Schema{context_app: ctx_app} = schema, paths, binding) do
     files = files_to_be_generated(schema)
-    Mix.Phoenix.copy_from(paths,"priv/templates/phx.gen.schema", binding, files)
+    Mix.PhoenixCustomGenerators.copy_from(paths,"priv/templates/phx.gen.schema", binding, files)
 
     if schema.migration? do
-      migration_path = Mix.Phoenix.context_app_path(ctx_app, "priv/repo/migrations/#{timestamp()}_create_#{schema.table}.exs")
-      Mix.Phoenix.copy_from paths, "priv/templates/phx.gen.schema", binding, [
+      migration_path = Mix.PhoenixCustomGenerators.context_app_path(ctx_app, "priv/repo/migrations/#{timestamp()}_create_#{schema.table}.exs")
+      Mix.PhoenixCustomGenerators.copy_from paths, "priv/templates/phx.gen.schema", binding, [
         {:eex, "migration.exs", migration_path},
       ]
     end

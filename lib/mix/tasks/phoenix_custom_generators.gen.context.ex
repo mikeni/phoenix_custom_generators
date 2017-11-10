@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Phx.Gen.Context do
+defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Context do
   @shortdoc "Generates a context with functions around an Ecto schema"
 
   @moduledoc """
@@ -65,8 +65,8 @@ defmodule Mix.Tasks.Phx.Gen.Context do
 
   use Mix.Task
 
-  alias Mix.Phoenix.{Context, Schema}
-  alias Mix.Tasks.Phx.Gen
+  alias Mix.PhoenixCustomGenerators.{Context, Schema}
+  alias Mix.Tasks.PhoenixCustomGenerators.Gen
 
   @switches [binary_id: :boolean, table: :string, web: :string,
              schema: :boolean, context: :boolean, context_app: :string]
@@ -81,7 +81,7 @@ defmodule Mix.Tasks.Phx.Gen.Context do
 
     {context, schema} = build(args)
     binding = [context: context, schema: schema]
-    paths = Mix.Phoenix.generator_paths()
+    paths = Mix.PhoenixCustomGenerators.generator_paths()
 
     prompt_for_conflicts(context)
 
@@ -93,7 +93,7 @@ defmodule Mix.Tasks.Phx.Gen.Context do
   defp prompt_for_conflicts(context) do
     context
     |> files_to_be_generated()
-    |> Mix.Phoenix.prompt_for_conflicts()
+    |> Mix.PhoenixCustomGenerators.prompt_for_conflicts()
   end
 
   @doc false
@@ -140,11 +140,11 @@ defmodule Mix.Tasks.Phx.Gen.Context do
 
   defp inject_schema_access(%Context{file: file} = context, paths, binding) do
     unless Context.pre_existing?(context) do
-      Mix.Generator.create_file(file, Mix.Phoenix.eval_from(paths, "priv/templates/phx.gen.context/context.ex", binding))
+      Mix.Generator.create_file(file, Mix.PhoenixCustomGenerators.eval_from(paths, "priv/templates/phx.gen.context/context.ex", binding))
     end
 
     paths
-    |> Mix.Phoenix.eval_from("priv/templates/phx.gen.context/#{schema_access_template(context)}", binding)
+    |> Mix.PhoenixCustomGenerators.eval_from("priv/templates/phx.gen.context/#{schema_access_template(context)}", binding)
     |> inject_eex_before_final_end(file, binding)
   end
 
@@ -154,11 +154,11 @@ defmodule Mix.Tasks.Phx.Gen.Context do
 
   defp inject_tests(%Context{test_file: test_file} = context, paths, binding) do
     unless Context.pre_existing_tests?(context) do
-      Mix.Generator.create_file(test_file, Mix.Phoenix.eval_from(paths, "priv/templates/phx.gen.context/context_test.exs", binding))
+      Mix.Generator.create_file(test_file, Mix.PhoenixCustomGenerators.eval_from(paths, "priv/templates/phx.gen.context/context_test.exs", binding))
     end
 
     paths
-    |> Mix.Phoenix.eval_from("priv/templates/phx.gen.context/test_cases.exs", binding)
+    |> Mix.PhoenixCustomGenerators.eval_from("priv/templates/phx.gen.context/test_cases.exs", binding)
     |> inject_eex_before_final_end(test_file, binding)
   end
 
