@@ -2,6 +2,11 @@
 
 **TODO: Add description**
 
+
+### vertical attrs for controller files
+### json date values are shown correctly as strings
+
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
@@ -18,4 +23,10 @@ end
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/phoenix_custom_generators](https://hexdocs.pm/phoenix_custom_generators).
+
+
+
+
+
+
 

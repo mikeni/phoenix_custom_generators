@@ -2,9 +2,15 @@
   describe "<%= schema.plural %>" do
     alias <%= inspect schema.module %>
 
-    @valid_attrs <%= inspect schema.params.create %>
-    @update_attrs <%= inspect schema.params.update %>
-    @invalid_attrs <%= inspect for {key, _} <- schema.params.create, into: %{}, do: {key, nil} %>
+    @valid_attrs %{<%= for {k, v} <- schema.params.create do %>
+      <%= k %>: <%= inspect v %>,<% end %>
+    }
+    @update_attrs %{<%= for {k, v} <- schema.params.update do %>
+      <%= k %>: <%= inspect v %>,<% end %>
+    }
+    @invalid_attrs %{<%= for {k, _} <- schema.params.create do %>
+      <%= k %>: nil,<% end %>
+    }
 
     def <%= schema.singular %>_fixture(attrs \\ %{}) do
       {:ok, <%= schema.singular %>} =
