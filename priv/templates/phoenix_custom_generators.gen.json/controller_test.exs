@@ -37,7 +37,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
 
       conn = get conn, <%= schema.route_helper %>_path(conn, :show, id)
       assert json_response(conn, 200)["data"] == %{
-        "id" => id<%= for {key, val} <- schema.params.create do %>,
+        "id" => id<%= for {key, val} <- schema.params.create_json do %>,
         "<%= key %>" => <%= inspect val %><% end %>}
     end
 
@@ -56,7 +56,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
 
       conn = get conn, <%= schema.route_helper %>_path(conn, :show, id)
       assert json_response(conn, 200)["data"] == %{
-        "id" => id<%= for {key, val} <- schema.params.update do %>,
+        "id" => id<%= for {key, val} <- schema.params.update_json do %>,
         "<%= key %>" => <%= inspect val %><% end %>}
     end
 

@@ -99,6 +99,8 @@ defmodule Mix.PhoenixCustomGenerators.Schema do
       params: %{
         create: create_params,
         update: params(attrs, :update),
+        create_json: params(attrs, :create_json),
+        update_json: params(attrs, :update_json),
         default_key: string_attr || default_params_key
       },
       web_namespace: web_namespace,
@@ -144,7 +146,7 @@ defmodule Mix.PhoenixCustomGenerators.Schema do
   @doc """
   Generates some sample params based on the parsed attributes.
   """
-  def params(attrs, action \\ :create) when action in [:create, :update] do
+  def params(attrs, action \\ :create) when action in [:create, :update, :create_json, :update_json] do
     attrs
     |> Enum.reject(fn
         {_, {:references, _}} -> true
@@ -196,6 +198,23 @@ defmodule Mix.PhoenixCustomGenerators.Schema do
         _               -> "some #{key}"
     end
   end
+  defp type_to_default(key, t, :create_json) do
+    case t do
+        {:array, _}     -> []
+        :integer        -> 42
+        :float          -> 120.5
+        :decimal        -> "120.5"
+        :boolean        -> true
+        :map            -> %{}
+        :text           -> "some #{key}"
+        :date           -> "2010-04-17"
+        :time           -> "14:00:00.000000"
+        :uuid           -> "7488a646-e31f-11e4-aace-600308960662"
+        :utc_datetime   -> "2010-04-17T14:00:00.000000"
+        :naive_datetime -> "2010-04-17T14:00:00.000000"
+        _               -> "some #{key}"
+    end
+  end
   defp type_to_default(key, t, :update) do
     case t do
         {:array, _}     -> []
@@ -210,6 +229,23 @@ defmodule Mix.PhoenixCustomGenerators.Schema do
         :uuid           -> "7488a646-e31f-11e4-aace-600308960668"
         :utc_datetime   -> "2011-05-18 15:01:01.000000Z"
         :naive_datetime -> ~N[2011-05-18 15:01:01.000000]
+        _               -> "some updated #{key}"
+    end
+  end
+  defp type_to_default(key, t, :update_json) do
+    case t do
+        {:array, _}     -> []
+        :integer        -> 43
+        :float          -> 456.7
+        :decimal        -> "456.7"
+        :boolean        -> false
+        :map            -> %{}
+        :text           -> "some updated #{key}"
+        :date           -> "2011-05-18"
+        :time           -> "15:01:01.000000"
+        :uuid           -> "7488a646-e31f-11e4-aace-600308960668"
+        :utc_datetime   -> "2011-05-18T15:01:01.000000Z"
+        :naive_datetime -> "2011-05-18T15:01:01.000000Z"
         _               -> "some updated #{key}"
     end
   end
