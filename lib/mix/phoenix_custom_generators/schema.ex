@@ -30,7 +30,9 @@ defmodule Mix.PhoenixCustomGenerators.Schema do
             web_path: nil,
             web_namespace: nil,
             context_app: nil,
-            route_helper: nil
+            route_helper: nil,
+            ex_machina_module: nil,
+            ex_machina_path: nil
 
   @valid_types [:integer, :float, :decimal, :boolean, :map, :string,
                 :array, :references, :text, :date, :time,
@@ -108,7 +110,10 @@ defmodule Mix.PhoenixCustomGenerators.Schema do
       route_helper: route_helper,
       sample_id: sample_id(opts),
       context_app: ctx_app,
-      generate?: generate?}
+      generate?: generate?,
+      ex_machina_module: opts[:ex_machina_module],
+      ex_machina_path: opts[:ex_machina_path]
+    }
   end
 
   @doc """

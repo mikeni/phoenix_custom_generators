@@ -3,6 +3,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
 
   alias <%= inspect context.module %>
   alias <%= inspect schema.module %>
+  <%= if schema.ex_machina_module do %>alias <%= schema.ex_machina_module %><% end %>
 
   @create_attrs %{<%= for {k, v} <- schema.params.create do %>
     <%= k %>: <%= inspect v %>,<% end %>
@@ -79,7 +80,8 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
   end
 
   defp create_<%= schema.singular %>(_) do
-    <%= schema.singular %> = fixture(:<%= schema.singular %>)
+    <%= if schema.ex_machina_module do %><%= schema.singular %> = <%= schema.ex_machina_module %>.insert(:<%= schema.singular %>)
+    <% else %><%= schema.singular %> = fixture(:<%= schema.singular %>)<% end %>
     {:ok, <%= schema.singular %>: <%= schema.singular %>}
   end
 end

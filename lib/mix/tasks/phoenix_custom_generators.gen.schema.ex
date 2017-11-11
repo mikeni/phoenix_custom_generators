@@ -82,7 +82,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Schema do
   alias Mix.PhoenixCustomGenerators.Schema
 
   @switches [migration: :boolean, binary_id: :boolean, table: :string,
-             web: :string]
+             web: :string, ex_machina_module: :string, ex_machina_path: :string]
 
   @doc false
   def run(args) do
