@@ -1,5 +1,5 @@
-defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
-  @shortdoc "Generates controller, views, and context for a JSON resource"
+defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.JaSerializer do
+  @shortdoc "Generates controller, views, and context for a JSON-API resource"
 
   use Mix.Task
 
@@ -9,7 +9,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
   @doc false
   def run(args) do
     if Mix.Project.umbrella? do
-      Mix.raise "mix phoenix_custom_generators.gen.json can only be run inside an application directory"
+      Mix.raise "mix phoenix_custom_generators.gen.ja_serializer can only be run inside an application directory"
     end
 
     {context, schema} = Gen.Context.build(args)
@@ -55,7 +55,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
   @doc false
   def copy_new_files(%Context{} = context, paths, binding) do
     files = files_to_be_generated(context)
-    Mix.PhoenixCustomGenerators.copy_from paths, "priv/templates/phoenix_custom_generators.gen.json", binding, files
+    Mix.PhoenixCustomGenerators.copy_from paths, "priv/templates/phoenix_custom_generators.gen.ja_serializer", binding, files
     if context.generate?, do: Gen.Context.copy_new_files(context, paths, binding)
 
     context
