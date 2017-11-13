@@ -20,6 +20,11 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
     <%= schema.singular %>
   end
 
+  def dasherize_keys(attrs) do
+    Enum.map(attrs, fn {k, v} -> {JaSerializer.Formatter.Utils.format_key(k), v} end)
+    |> Enum.into(%{})
+  end
+
   <%= if Enum.count(schema.assocs) != 0 do %>
   defp relationships do <%= for {ref, key, mod, _} <- schema.assocs do %>
     <%= ref %> = Repo.insert!(%<%= mod %>{})<% end %>
@@ -58,7 +63,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
         "meta" => %{},
         "data" => %{
           "type" => "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>",
-          "attributes" => @create_attrs,
+          "attributes" => dasherize_keys(@create_attrs),
           "relationships" => relationships
         }
       }
@@ -77,7 +82,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
         "meta" => %{},
         "data" => %{
           "type" => "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>",
-          "attributes" => @invalid_attrs,
+          "attributes" => dasherize_keys(@invalid_attrs),
           "relationships" => relationships
         }
       }
@@ -94,7 +99,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
         "data" => %{
           "type" => "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>",
           "id" => "#{<%= schema.singular %>.id}",
-          "attributes" => @update_attrs,
+          "attributes" => dasherize_keys(@update_attrs),
           "relationships" => relationships
         }
       }
@@ -118,7 +123,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
       "data" => %{
         "type" => "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>",
         "id" => "#{<%= schema.singular %>.id}",
-        "attributes" => @invalid_attrs,
+        "attributes" => dasherize_keys(@invalid_attrs),
         "relationships" => relationships
       }
     }
