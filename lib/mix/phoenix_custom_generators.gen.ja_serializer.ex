@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
+defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.JaSerializer do
   use Mix.Task
 
   @shortdoc "Generates a controller and model for a JSON based resource"
@@ -38,6 +38,8 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
     opts = Keyword.merge(default_opts, opts)
 
     attrs   = Mix.PhoenixCustomGenerators.attrs(attrs)
+    refs     = references(attrs)
+    non_refs = non_references(attrs) ++ [:inserted_at, :updated_at] |> Enum.map(fn(x) -> Atom.to_string(x) end)
     binding = Mix.PhoenixCustomGenerators.inflect(singular)
     path    = binding[:path]
     route   = String.split(path, "/") |> Enum.drop(-1) |> Kernel.++([plural]) |> Enum.join("/")
@@ -47,6 +49,8 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
       sample_id: sample_id(opts),
       attrs: attrs, 
       params: Mix.PhoenixCustomGenerators.params(attrs, opts),
+      refs: refs,
+      non_refs: non_refs,
       ex_machina_module: opts[:ex_machina_module],
       ecto_calendar_types: Keyword.get(opts, :ecto_calendar_types, false)
     ]
@@ -60,7 +64,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
       {:eex, "controller_test.exs", "test/controllers/#{path}_controller_test.exs"},
     ] ++ changeset_view()
 
-    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix.gen.json", "", binding, files
+    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix.gen.ja_serializer", "", binding, files
 
     instructions = """
 
@@ -109,14 +113,38 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
   @spec raise_with_help() :: no_return()
   defp raise_with_help do
     Mix.raise """
-    mix phoenix_custom_generators.gen.json expects both singular and plural names
+    mix phoenix_custom_generators.gen.ja_serializer expects both singular and plural names
     of the generated resource followed by any number of attributes:
 
-        mix phoenix_custom_generators.gen.json User users name:string
+        mix phoenix_custom_generators.gen.ja_serializer User users name:string
     """
   end
 
   defp paths do
     [".", :phoenix_custom_generators]
   end
+
+  defp references(attrs) do
+    rv = for {k, v} <- attrs do
+      references_strings({k, v})
+    end
+
+    rv |> Enum.reject(fn(x) -> is_nil(x) end)
+  end
+
+  defp references_strings({k, v}) when is_tuple(v), do: Atom.to_string(k) |> String.replace_trailing("_id", "")
+  defp references_strings(_),                       do: nil
+
+  defp non_references(attrs) do
+    rv = for {k, v} <- attrs do
+      non_references_strings({k, v})
+    end
+
+    rv |> Enum.reject(fn(x) -> is_nil(x) end)
+  end
+
+  defp non_references_strings({_k, v}) when is_tuple(v), do: nil
+  defp non_references_strings({k, _v}),                  do: k
+
+
 end

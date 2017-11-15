@@ -9,7 +9,11 @@ defmodule <%= module %>ControllerTest do
   @invalid_attrs %{}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    conn = conn
+      |> put_req_header("accept", "application/vnd.api+json")
+      |> put_req_header("content-type", "application/vnd.api+json")
+      
+    {:ok, conn: conn}
   end
 
   test "lists all entries on index", %{conn: conn} do
@@ -21,8 +25,11 @@ defmodule <%= module %>ControllerTest do
     <%= if ex_machina_module do %><%= singular %> = <%= ex_machina_module %>.insert(:<%= singular %>)
     <% else %><%= singular %> = Repo.insert! %<%= alias %>{}<% end %>
     conn = get conn, <%= singular %>_path(conn, :show, <%= singular %>)
-    assert json_response(conn, 200)["data"] == %{"id" => <%= singular %>.id<%= for {k, _} <- attrs do %>,
-      "<%= k %>" => <%= singular %>.<%= k %><% end %>}
+    data =  json_response(conn, 200)["data"]
+    assert data["id"] == "#{<%= singular %>.id}"
+    assert data["type"] == "<%= JaSerializer.Formatter.Utils.format_key(singular) %>"
+    <%= for {k, _} <- attrs do %>assert data["attributes"]["<%= JaSerializer.Formatter.Utils.format_key(k) %>"] == <%= singular %>.<%= k %>
+    <% end %>
   end
 
   test "renders page not found when id is nonexistent", %{conn: conn} do
