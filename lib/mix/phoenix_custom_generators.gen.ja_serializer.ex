@@ -64,7 +64,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.JaSerializer do
       {:eex, "controller_test.exs", "test/controllers/#{path}_controller_test.exs"},
     ] ++ changeset_view()
 
-    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix.gen.ja_serializer", "", binding, files
+    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix_custom_generators.gen.ja_serializer", "", binding, files
 
     instructions = """
 

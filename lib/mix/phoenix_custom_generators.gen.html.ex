@@ -46,7 +46,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Html do
     Mix.PhoenixCustomGenerators.check_module_name_availability!(binding[:module] <> "Controller")
     Mix.PhoenixCustomGenerators.check_module_name_availability!(binding[:module] <> "View")
 
-    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix.gen.html", "", binding, [
+    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix_custom_generators.gen.html", "", binding, [
       {:eex, "controller.ex",       "web/controllers/#{path}_controller.ex"},
       {:eex, "edit.html.eex",       "web/templates/#{path}/edit.html.eex"},
       {:eex, "form.html.eex",       "web/templates/#{path}/form.html.eex"},

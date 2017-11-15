@@ -60,7 +60,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
       {:eex, "controller_test.exs", "test/controllers/#{path}_controller_test.exs"},
     ] ++ changeset_view()
 
-    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix.gen.json", "", binding, files
+    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix_custom_generators.gen.json", "", binding, files
 
     instructions = """
 
