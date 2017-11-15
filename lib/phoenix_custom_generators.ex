@@ -184,7 +184,10 @@ defmodule Mix.PhoenixCustomGenerators do
   end
 
   defp type_to_default(t, opts) do
-    ecto_calendar_type = Keyword.get(opts, :ecto_calendar_types, :native)
+    ecto_calendar_type = case Keyword.get(opts, :ecto_calendar_types, false) do
+      true -> :ecto_calendar_type
+      false -> :native
+    end
     case {t, ecto_calendar_type} do
         {{:array, _}, _} -> []
         {:integer, _} -> 42
