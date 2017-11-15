@@ -33,20 +33,20 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Html do
     default_opts = Application.get_env(:phoenix, :generators, [])
     opts = Keyword.merge(default_opts, opts)
 
-    attrs   = Mix.Phoenix.attrs(attrs)
-    binding = Mix.Phoenix.inflect(singular)
+    attrs   = Mix.PhoenixCustomGenerators.attrs(attrs)
+    binding = Mix.PhoenixCustomGenerators.inflect(singular)
     path    = binding[:path]
     route   = String.split(path, "/") |> Enum.drop(-1) |> Kernel.++([plural]) |> Enum.join("/")
     binding = binding ++ [plural: plural, route: route, attrs: attrs,
                           sample_id: sample_id(opts),
-                          inputs: inputs(attrs), params: Mix.Phoenix.params(attrs),
+                          inputs: inputs(attrs), params: Mix.PhoenixCustomGenerators.params(attrs, opts),
                           template_singular: String.replace(binding[:singular], "_", " "),
                           template_plural: String.replace(plural, "_", " ")]
 
-    Mix.Phoenix.check_module_name_availability!(binding[:module] <> "Controller")
-    Mix.Phoenix.check_module_name_availability!(binding[:module] <> "View")
+    Mix.PhoenixCustomGenerators.check_module_name_availability!(binding[:module] <> "Controller")
+    Mix.PhoenixCustomGenerators.check_module_name_availability!(binding[:module] <> "View")
 
-    Mix.Phoenix.copy_from paths(), "priv/templates/phoenix.gen.html", "", binding, [
+    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix.gen.html", "", binding, [
       {:eex, "controller.ex",       "web/controllers/#{path}_controller.ex"},
       {:eex, "edit.html.eex",       "web/templates/#{path}/edit.html.eex"},
       {:eex, "form.html.eex",       "web/templates/#{path}/form.html.eex"},

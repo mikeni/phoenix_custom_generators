@@ -97,13 +97,13 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Model do
     default_opts = Application.get_env(:phoenix, :generators, [])
     opts = Keyword.merge(default_opts, opts)
 
-    uniques   = Mix.Phoenix.uniques(attrs)
-    attrs     = Mix.Phoenix.attrs(attrs)
-    binding   = Mix.Phoenix.inflect(singular)
-    params    = Mix.Phoenix.params(attrs)
+    uniques   = Mix.PhoenixCustomGenerators.uniques(attrs)
+    attrs     = Mix.PhoenixCustomGenerators.attrs(attrs)
+    binding   = Mix.PhoenixCustomGenerators.inflect(singular)
+    params    = Mix.PhoenixCustomGenerators.params(attrs, opts)
     path      = binding[:path]
 
-    Mix.Phoenix.check_module_name_availability!(binding[:module])
+    Mix.PhoenixCustomGenerators.check_module_name_availability!(binding[:module])
     {assocs, attrs} = partition_attrs_and_assocs(attrs)
 
     binding = binding ++
@@ -117,7 +117,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Model do
       {:eex, "model_test.exs", "test/models/#{path}_test.exs"},
     ] ++ migration(opts[:migration], path)
 
-    Mix.Phoenix.copy_from paths(), "priv/templates/phoenix.gen.model", "", binding, files
+    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix.gen.model", "", binding, files
 
     # Print any extra instruction given by parent generators
     Mix.shell.info opts[:instructions] || ""
@@ -175,7 +175,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Model do
   defp assocs(assocs) do
     Enum.map assocs, fn {key_id, {:references, source}} ->
       key   = String.replace(Atom.to_string(key_id), "_id", "")
-      assoc = Mix.Phoenix.inflect key
+      assoc = Mix.PhoenixCustomGenerators.inflect key
       {String.to_atom(key), key_id, assoc[:module], source}
     end
   end

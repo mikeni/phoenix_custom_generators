@@ -37,8 +37,8 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
     default_opts = Application.get_env(:phoenix, :generators, [])
     opts = Keyword.merge(default_opts, opts)
 
-    attrs   = Mix.Phoenix.attrs(attrs)
-    binding = Mix.Phoenix.inflect(singular)
+    attrs   = Mix.PhoenixCustomGenerators.attrs(attrs)
+    binding = Mix.PhoenixCustomGenerators.inflect(singular)
     path    = binding[:path]
     route   = String.split(path, "/") |> Enum.drop(-1) |> Kernel.++([plural]) |> Enum.join("/")
     binding = binding ++ [
@@ -46,16 +46,13 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
       route: route,
       sample_id: sample_id(opts),
       attrs: attrs, 
-      params: Mix.Phoenix.params(attrs),
+      params: Mix.PhoenixCustomGenerators.params(attrs, opts),
       ex_machina: Keyword.get(opts, :ex_machina, false),
       ecto_calendar_types: Keyword.get(opts, :ecto_calendar_types, false)
     ]
 
-IO.inspect(opts, limit: :infinity)
-IO.inspect(binding, limit: :infinity)
-
-    Mix.Phoenix.check_module_name_availability!(binding[:module] <> "Controller")
-    Mix.Phoenix.check_module_name_availability!(binding[:module] <> "View")
+    Mix.PhoenixCustomGenerators.check_module_name_availability!(binding[:module] <> "Controller")
+    Mix.PhoenixCustomGenerators.check_module_name_availability!(binding[:module] <> "View")
 
     files = [
       {:eex, "controller.ex",       "web/controllers/#{path}_controller.ex"},
@@ -63,7 +60,7 @@ IO.inspect(binding, limit: :infinity)
       {:eex, "controller_test.exs", "test/controllers/#{path}_controller_test.exs"},
     ] ++ changeset_view()
 
-    Mix.Phoenix.copy_from paths(), "priv/templates/phoenix.gen.json", "", binding, files
+    Mix.PhoenixCustomGenerators.copy_from paths(), "priv/templates/phoenix.gen.json", "", binding, files
 
     instructions = """
 
