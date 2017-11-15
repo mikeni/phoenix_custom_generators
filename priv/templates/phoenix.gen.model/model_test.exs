@@ -3,7 +3,9 @@ defmodule <%= module %>Test do
 
   alias <%= module %>
 
-  @valid_attrs <%= inspect params %>
+  @valid_attrs %{<%= for {k, v} <- params do %>
+    <%= k %>: <%= inspect v %>,<% end %>
+  }
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
