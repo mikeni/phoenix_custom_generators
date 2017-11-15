@@ -21,7 +21,7 @@ defmodule <%= module %>Controller do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(<%= base %>.ChangesetView, "error.json", changeset: changeset)
+        |> render(:errors, data: changeset)
     end
   end
 
@@ -40,7 +40,7 @@ defmodule <%= module %>Controller do
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> render(<%= base %>.ChangesetView, "error.json", changeset: changeset)
+        |> render(:errors, data: changeset)
     end
   end
 
