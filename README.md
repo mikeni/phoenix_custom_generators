@@ -9,7 +9,7 @@ Add to your application's mix.deps
 ```elixir
 def deps do
   [
-    {:phoenix_custom_generators, "~> 0.0.1"}
+    {:phoenix_custom_generators, "~> 0.1.0"}
   ]
 end
 ```
