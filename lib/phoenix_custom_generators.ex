@@ -122,6 +122,24 @@ defmodule Mix.PhoenixCustomGenerators do
     |> Enum.into(%{}, fn {k, t} -> {k, type_to_default(t, opts)} end)
   end
 
+  def params_factory_girl(attrs, opts) do
+    attrs
+    |> Enum.reject(fn
+        {_, {:references, _}} -> true
+        {_, _} -> false
+       end)
+    |> Enum.into(%{}, fn {k, t} -> {k, type_to_default_factory_girl(t, opts)} end)
+  end
+
+  def params_json(attrs, opts) do
+    attrs
+    |> Enum.reject(fn
+        {_, {:references, _}} -> true
+        {_, _} -> false
+       end)
+    |> Enum.into(%{}, fn {k, t} -> {k, type_to_default_json(t)} end)
+  end
+
   @doc """
   Checks the availability of a given module name.
   """
@@ -199,10 +217,51 @@ defmodule Mix.PhoenixCustomGenerators do
         {:date, :ecto_calendar_type} -> %{year: 2010, month: 4, day: 17}
         {:date, :native} -> %Date{year: 2010, month: 4, day: 17}
         {:time, :ecto_calendar_type} -> %{hour: 14, min: 0, sec: 0}
-        {:time, :native} -> %Time{hour: 14, minute: 0, second: 0, microsecond: {0, 6}}
+        {:time, :native} -> %Time{hour: 14, minute: 0, second: 0, microsecond: {0, 0}}
         {:datetime, :ecto_calendar_type} -> %{year: 2010, month: 4, day: 17, hour: 14, min: 0, sec: 0}
         {:datetime, :native} -> "2010-04-17 14:00:00.000000Z"
         {:uuid, _} -> "7488a646-e31f-11e4-aace-600308960662"
+        _           -> "some content"
+    end
+  end
+
+  defp type_to_default_factory_girl(t, opts) do
+    ecto_calendar_type = case Keyword.get(opts, :ecto_calendar_types, false) do
+      true -> :ecto_calendar_type
+      false -> :native
+    end
+    case {t, ecto_calendar_type} do
+        {{:array, _}, _} -> "[]"
+        {:integer, _} -> "42"
+        {:float, _} -> "120.5"
+        {:decimal, _} -> "Decimal.new(\"120.5\")"
+        {:boolean, _} -> "true"
+        {:map, _} -> "%{}"
+        {:text, _} -> "\"some content\""
+        {:date, :ecto_calendar_type} -> "%Ecto.Date{year: 2010, month: 4, day: 17}"
+        {:date, :native} -> "%Date{year: 2010, month: 4, day: 17}"
+        {:time, :ecto_calendar_type} -> "%Ecto.Time{hour: 14, min: 0, sec: 0}"
+        {:time, :native} -> "%Time{hour: 14, minute: 0, second: 0, microsecond: {0, 0}}"
+        {:datetime, :ecto_calendar_type} -> "%Ecto.DateTime{year: 2010, month: 4, day: 17, hour: 14, min: 0, sec: 0}"
+        {:datetime, :native} -> "\"2010-04-17 14:00:00.000000Z\""
+        {:uuid, _} -> "\"7488a646-e31f-11e4-aace-600308960662\""
+        _           -> "\"some content\""
+    end
+  end
+
+  defp type_to_default_json(t) do
+    case t do
+        {:array, _} -> []
+        :integer -> 42
+        :float -> 120.5
+        :decimal -> "120.5"
+        :boolean -> true
+        :map -> %{}
+        :text -> "some content"
+        :date -> "2010-04-17"
+        :time -> "14:00:00"
+        :datetime -> "2010-04-17T14:00:00"
+        :uuid -> "7488a646-e31f-11e4-aace-600308960662"
         _           -> "some content"
     end
   end

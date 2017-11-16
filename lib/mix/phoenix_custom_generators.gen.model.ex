@@ -107,10 +107,19 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Model do
     {assocs, attrs} = partition_attrs_and_assocs(attrs)
 
     binding = binding ++
-              [attrs: attrs, plural: plural, types: types(attrs, opts), uniques: uniques,
-               assocs: assocs(assocs), indexes: indexes(plural, assocs, uniques),
-               schema_defaults: schema_defaults(attrs), binary_id: opts[:binary_id],
-               migration_defaults: migration_defaults(attrs), params: params]
+              [
+                attrs: attrs, 
+                plural: plural, 
+                types: types(attrs, opts), 
+                uniques: uniques,
+                assocs: assocs(assocs), 
+                indexes: indexes(plural, assocs, uniques),
+                schema_defaults: schema_defaults(attrs), 
+                binary_id: opts[:binary_id],
+                migration_defaults: migration_defaults(attrs), 
+                params: params,
+                params_factory_girl: Mix.PhoenixCustomGenerators.params_factory_girl(attrs, opts),
+              ]
 
     files = [
       {:eex, "model.ex",       "web/models/#{path}.ex"},
@@ -129,7 +138,27 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Model do
           $ mix ecto.migrate
       """
     end
+
+    if opts[:ex_machina_module] do
+      possible_files = Enum.map(paths(), &to_app_source(&1, "priv/templates/phoenix_custom_generators.gen.model/ex_machina.exs"))
+      source = Enum.find_value(possible_files, fn possible_file ->
+        if File.exists?(possible_file), do: possible_file
+      end) || raise "could not find ex_machina factory template file"
+
+      Mix.shell.info """
+      Add the following function to your ex_machina factory module:
+
+      #{EEx.eval_file(source, binding)}
+      """
+
+    end
   end
+
+
+  defp to_app_source(path, source_dir) when is_binary(path),
+    do: Path.join(path, source_dir)
+  defp to_app_source(app, source_dir) when is_atom(app),
+    do: Application.app_dir(app, source_dir)
 
   defp validate_args!([_, plural | _] = args) do
     cond do

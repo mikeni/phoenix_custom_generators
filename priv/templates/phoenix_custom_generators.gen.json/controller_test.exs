@@ -6,7 +6,9 @@ defmodule <%= module %>ControllerTest do
     <%= k %>: <%= inspect v %>,<% end %>
   }
 
-  @invalid_attrs %{}
+  @invalid_attrs %{<%= for {k, _} <- params do %>
+    <%= k %>: nil,<% end %>
+  }
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -21,8 +23,8 @@ defmodule <%= module %>ControllerTest do
     <%= if ex_machina_module do %><%= singular %> = <%= ex_machina_module %>.insert(:<%= singular %>)
     <% else %><%= singular %> = Repo.insert! %<%= alias %>{}<% end %>
     conn = get conn, <%= singular %>_path(conn, :show, <%= singular %>)
-    assert json_response(conn, 200)["data"] == %{"id" => <%= singular %>.id<%= for {k, _} <- attrs do %>,
-      "<%= k %>" => <%= singular %>.<%= k %><% end %>}
+    assert json_response(conn, 200)["data"] == %{"id" => <%= singular %>.id<%= for {k, v} <- params_json do %>,
+      "<%= k %>" => <%= inspect v %><% end %>}
   end
 
   test "renders page not found when id is nonexistent", %{conn: conn} do

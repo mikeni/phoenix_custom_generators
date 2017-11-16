@@ -47,6 +47,7 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Json do
       sample_id: sample_id(opts),
       attrs: attrs, 
       params: Mix.PhoenixCustomGenerators.params(attrs, opts),
+      params_json: Mix.PhoenixCustomGenerators.params_json(attrs, opts),
       ex_machina_module: opts[:ex_machina_module],
       ecto_calendar_types: Keyword.get(opts, :ecto_calendar_types, false)
     ]
