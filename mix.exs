@@ -7,7 +7,10 @@ defmodule PhoenixCustomGenerators.Mixfile do
       version: "0.1.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
-      deps: deps()
+      deps: deps(),
+      source_url: "https://github.com/mikeni/phoenix_custom_generators"
+      package: package(),
+      description: description(),
     ]
   end
 
