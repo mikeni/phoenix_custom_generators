@@ -15,10 +15,10 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
     <%= k %>: nil,<% end %>
   }
 
-  def fixture(:<%= schema.singular %>) do
+  <%= unless schema.ex_machina_module do %>def fixture(:<%= schema.singular %>) do
     {:ok, <%= schema.singular %>} = <%= inspect context.alias %>.create_<%= schema.singular %>(@create_attrs)
     <%= schema.singular %>
-  end
+  end<% end %>
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}

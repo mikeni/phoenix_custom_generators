@@ -20,7 +20,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
     <%= schema.singular %>
   end
 
-  def dasherize_keys(attrs) do
+  defp dasherize_keys(attrs) do
     Enum.map(attrs, fn {k, v} -> {JaSerializer.Formatter.Utils.format_key(k), v} end)
     |> Enum.into(%{})
   end
