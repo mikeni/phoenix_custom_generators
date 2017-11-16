@@ -38,7 +38,6 @@ defmodule PhoenixCustomGenerators.Mixfile do
   defp package() do
     [
       # This option is only needed when you don't want to use the OTP application name
-      name: "postgrex",
       maintainers: ["Michael Ni"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/mikeni/phoenix_custom_generators"}
