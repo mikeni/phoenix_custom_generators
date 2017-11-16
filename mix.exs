@@ -26,4 +26,20 @@ defmodule PhoenixCustomGenerators.Mixfile do
       {:phoenix, "> 0.10.0 and < 1.3.0"}
     ]
   end
+
+  defp description() do
+    "Phoenix Generators with ExMachina and JaSerializer Support"
+  end
+
+  defp package() do
+    [
+      # This option is only needed when you don't want to use the OTP application name
+      name: "postgrex",
+      # These are the default files included in the package
+      files: ["lib", "priv", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
+      maintainers: ["Michael Ni"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/mikeni/phoenix_custom_generators"}
+    ]
+  end
 end
