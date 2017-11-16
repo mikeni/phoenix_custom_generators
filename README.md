@@ -2,6 +2,10 @@
 
 **Phoenix Generators with ExMachina and JaSerializer Support**
 
+PhoenixCustomGenerators v1.0 supports Phoenix v1.3 with context and schemas.  
+
+For pre-Phoenix v1.3 support with models, use [PhoenixCustomGenerators v0.1](https://github.com/mikeni/phoenix_custom_generators/tree/pre1-3_generators)
+
 ## Installation
 
 Add to your application's mix.deps
