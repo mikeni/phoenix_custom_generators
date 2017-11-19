@@ -8,7 +8,8 @@ defmodule <%= inspect schema.module %> do
   @foreign_key_type :binary_id<% end %>
   schema <%= inspect schema.table %> do
 <%= for {k, v} <- schema.types do %>    field <%= inspect k %>, <%= inspect v %><%= schema.defaults[k] %>
-<% end %><%= for {_, k, _, _} <- schema.assocs do %>    field <%= inspect k %>, <%= if schema.binary_id do %>:binary_id<% else %>:id<% end %>
+<% end %><%= for {name, k, mod, _} <- schema.assocs do %>    field <%= inspect k %>, <%= if schema.binary_id do %>:binary_id<% else %>:id<% end %>
+    # belongs_to <%= name %>, <%= mod %>
 <% end %>
     timestamps()
   end
@@ -16,8 +17,14 @@ defmodule <%= inspect schema.module %> do
   @doc false
   def changeset(%<%= inspect schema.alias %>{} = <%= schema.singular %>, attrs) do
     <%= schema.singular %>
-    |> cast(attrs, [<%= Enum.map_join(schema.attrs, ", ", &inspect(elem(&1, 0))) %>])
-    |> validate_required([<%= Enum.map_join(schema.attrs, ", ", &inspect(elem(&1, 0))) %>])
+    |> cast(attrs, [
+      <%= for {k, _} <- schema.attrs do %><%= inspect k%>,
+      <% end %>
+    ])
+    |> validate_required([
+      <%= for {k, _} <- schema.attrs do %><%= inspect k%>,
+      <% end %>
+    ])
 <%= for k <- schema.uniques do %>    |> unique_constraint(<%= inspect k %>)
 <% end %>  end
 end
