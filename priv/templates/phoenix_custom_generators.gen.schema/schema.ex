@@ -9,7 +9,7 @@ defmodule <%= inspect schema.module %> do
   schema <%= inspect schema.table %> do
 <%= for {k, v} <- schema.types do %>    field <%= inspect k %>, <%= inspect v %><%= schema.defaults[k] %>
 <% end %><%= for {name, k, mod, _} <- schema.assocs do %>    field <%= inspect k %>, <%= if schema.binary_id do %>:binary_id<% else %>:id<% end %>
-    # belongs_to <%= name %>, <%= mod %>
+    # belongs_to <%= inspect name %>, <%= mod %>
 <% end %>
     timestamps()
   end
