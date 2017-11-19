@@ -68,8 +68,16 @@ defmodule Mix.Tasks.PhoenixCustomGenerators.Gen.Context do
   alias Mix.PhoenixCustomGenerators.{Context, Schema}
   alias Mix.Tasks.PhoenixCustomGenerators.Gen
 
-  @switches [binary_id: :boolean, table: :string, web: :string,
-             schema: :boolean, context: :boolean, context_app: :string]
+  @switches [
+    binary_id: :boolean, 
+    table: :string, 
+    web: :string,
+    schema: :boolean, 
+    context: :boolean, 
+    context_app: :string,
+    ex_machina_module: :string, 
+    ex_machina_path: :string
+  ]
 
   @default_opts [schema: true, context: true]
 
