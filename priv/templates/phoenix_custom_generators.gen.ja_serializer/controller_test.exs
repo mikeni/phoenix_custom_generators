@@ -3,7 +3,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
 
   alias <%= inspect context.module %>
   alias <%= inspect schema.module %>
-  <%= if schema.ex_machina_module do %>alias <%= schema.ex_machina_module %><% end %>
+  <%= if schema.ex_machina_module do %>alias <%= schema.ex_machina_module %><% else %>alias <%= inspect schema.repo %><% end %>
 
   @create_attrs %{<%= for {k, v} <- schema.params.create do %>
     <%= k %>: <%= inspect v %>,<% end %>
@@ -15,19 +15,18 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
     <%= k %>: nil,<% end %>
   }
 
-  def fixture(:<%= schema.singular %>) do
+  <%= unless schema.ex_machina_module do %>def fixture(:<%= schema.singular %>) do
     {:ok, <%= schema.singular %>} = <%= inspect context.alias %>.create_<%= schema.singular %>(@create_attrs)
     <%= schema.singular %>
   end
-
+  <% end %>
   defp dasherize_keys(attrs) do
     Enum.map(attrs, fn {k, v} -> {JaSerializer.Formatter.Utils.format_key(k), v} end)
     |> Enum.into(%{})
   end
 
-  <%= if Enum.count(schema.assocs) != 0 do %>
-  defp relationships do <%= for {ref, key, mod, _} <- schema.assocs do %>
-    <%= ref %> = Repo.insert!(%<%= mod %>{})<% end %>
+  <%= if Enum.count(schema.assocs) != 0 do %>defp relationships do <%= for {ref, key, mod, _} <- schema.assocs do %>
+    <%= ref %> = <%= if schema.ex_machina_module do %><%= schema.ex_machina_module %>.insert(:<%= ref %>)<% else %>Repo.insert!(%<%= mod %>{})<% end %><% end %>
 
     %{<%= for {ref, key, _, _} <- schema.assocs do %>
       "<%= ref %>" => %{

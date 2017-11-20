@@ -13,7 +13,8 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
   end
 
   def create(conn, %{"data" => data = %{"type" => <%= inspect JaSerializer.Formatter.Utils.format_key(schema.singular) %>, "attributes" => <%= schema.singular %>_params}}) do
-    with {:ok, %<%= inspect schema.alias %>{} = <%= schema.singular %>} <- <%= inspect context.alias %>.create_<%= schema.singular %>(<%= schema.singular %>_params) do
+    attrs = Params.to_attributes(data)
+    with {:ok, %<%= inspect schema.alias %>{} = <%= schema.singular %>} <- <%= inspect context.alias %>.create_<%= schema.singular %>(attrs) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", <%= schema.route_helper %>_path(conn, :show, <%= schema.singular %>))
@@ -28,8 +29,9 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
 
   def update(conn, %{"id" => id, "data" => data = %{"type" => <%= inspect JaSerializer.Formatter.Utils.format_key(schema.singular) %>, "attributes" => <%= schema.singular %>_params}}) do
     <%= schema.singular %> = <%= inspect context.alias %>.get_<%= schema.singular %>!(id)
+    attrs = Params.to_attributes(data)
 
-    with {:ok, %<%= inspect schema.alias %>{} = <%= schema.singular %>} <- <%= inspect context.alias %>.update_<%= schema.singular %>(<%= schema.singular %>, <%= schema.singular %>_params) do
+    with {:ok, %<%= inspect schema.alias %>{} = <%= schema.singular %>} <- <%= inspect context.alias %>.update_<%= schema.singular %>(<%= schema.singular %>, attrs) do
       render(conn, "show.json-api", data: <%= schema.singular %>)
     end
   end
