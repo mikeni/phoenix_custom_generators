@@ -34,8 +34,8 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
   describe "create <%= schema.singular %>" do
     test "renders <%= schema.singular %> when data is valid", %{conn: conn} do
       attrs = @create_attrs
-      <%= for {ref, key, _, _} <- schema.assocs do %><%= ref %> = <%= if schema.ex_machina_module do %><%= schema.ex_machina_module %>.insert(:<%= ref %>)
-      <% else %>fixture(:<%= ref %>)
+      <%= for {ref, key, mod, _} <- schema.assocs do %><%= ref %> = <%= if schema.ex_machina_module do %><%= schema.ex_machina_module %>.insert(:<%= ref %>)
+      <% else %><%= schema.repo %>.insert(%<%= mod %>{})
       <% end %>attrs = Map.merge(attrs, %{<%= key %>: <%= ref %>.id })
       <% end %>
       conn = post conn, <%= schema.route_helper %>_path(conn, :create), <%= schema.singular %>: attrs
