@@ -58,7 +58,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
 
   describe "create <%= schema.singular %>" do
     test "renders <%= schema.singular %> when data is valid", %{conn: conn} do
-      conn = post conn, <%= schema.route_helper %>_path(conn, :create), %{
+      conn1 = post conn, <%= schema.route_helper %>_path(conn, :create), %{
         "meta" => %{},
         "data" => %{
           "type" => "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>",
@@ -66,13 +66,13 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
           "relationships" => relationships
         }
       }
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      assert %{"id" => id} = json_response(conn1, 201)["data"]
 
-      conn = get conn, <%= schema.route_helper %>_path(conn, :show, id)
-      data = json_response(conn, 200)["data"]
+      conn2 = get conn, <%= schema.route_helper %>_path(conn, :show, id)
+      data = json_response(conn2, 200)["data"]
       assert data["id"] == "#{id}"
       assert data["type"] == "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>"
-      <%= for {k, v} <- schema.params.create_json do %>assert data["attributes"]["<%= JaSerializer.Formatter.Utils.format_key(k) %>"] == <%= inspect v %>
+      <%= for {k, v} <- schema.params.create_json do %>assert data["attributes"]["<%= JaSerializer.Formatter.Utils.format_key(k) %>"] == @create_attrs.<%= k %>
       <% end %>
     end
 
@@ -93,7 +93,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
     setup [:create_<%= schema.singular %>]
 
     test "renders <%= schema.singular %> when data is valid", %{conn: conn, <%= schema.singular %>: %<%= inspect schema.alias %>{id: id} = <%= schema.singular %>} do
-      conn = put conn, <%= schema.route_helper %>_path(conn, :update, <%= schema.singular %>), %{
+      conn1 = put conn, <%= schema.route_helper %>_path(conn, :update, <%= schema.singular %>), %{
         "meta" => %{},
         "data" => %{
           "type" => "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>",
@@ -102,17 +102,17 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
           "relationships" => relationships
         }
       }
-      data = json_response(conn, 200)["data"]
+      data = json_response(conn1, 200)["data"]
       assert data["id"] == "#{id}"
       assert data["type"] == "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>"
-      <%= for {k, v} <- schema.params.update_json do %>assert data["attributes"]["<%= JaSerializer.Formatter.Utils.format_key(k) %>"] == <%= inspect v %>
+      <%= for {k, v} <- schema.params.update_json do %>assert data["attributes"]["<%= JaSerializer.Formatter.Utils.format_key(k) %>"] == @update_attrs.<%= k %>
       <% end %>
 
-      conn = get conn, <%= schema.route_helper %>_path(conn, :show, id)
-      data = json_response(conn, 200)["data"]
+      conn2 = get conn, <%= schema.route_helper %>_path(conn, :show, id)
+      data = json_response(conn2, 200)["data"]
       assert data["id"] == "#{id}"
       assert data["type"] == "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>"
-      <%= for {k, v} <- schema.params.update_json do %>assert data["attributes"]["<%= JaSerializer.Formatter.Utils.format_key(k) %>"] == <%= inspect v %>
+      <%= for {k, v} <- schema.params.update_json do %>assert data["attributes"]["<%= JaSerializer.Formatter.Utils.format_key(k) %>"] == @update_attrs.<%= k %>
       <% end %>
     end
 
@@ -134,8 +134,8 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
     setup [:create_<%= schema.singular %>]
 
     test "deletes chosen <%= schema.singular %>", %{conn: conn, <%= schema.singular %>: <%= schema.singular %>} do
-      conn = delete conn, <%= schema.route_helper %>_path(conn, :delete, <%= schema.singular %>)
-      assert response(conn, 204)
+      conn1 = delete conn, <%= schema.route_helper %>_path(conn, :delete, <%= schema.singular %>)
+      assert response(conn1, 204)
       assert_error_sent 404, fn ->
         get conn, <%= schema.route_helper %>_path(conn, :show, <%= schema.singular %>)
       end
