@@ -33,8 +33,12 @@
     end
 
     test "create_<%= schema.singular %>/1 with valid data creates a <%= schema.singular %>" do
-      assert {:ok, %<%= inspect schema.alias %>{} = <%= schema.singular %>} = <%= inspect context.alias %>.create_<%= schema.singular %>(@valid_attrs)<%= for {field, value} <- schema.params.create do %>
-      assert <%= schema.singular %>.<%= field %> == <%= Mix.Phoenix.Schema.value(schema, field, value) %><% end %>
+      attrs = @valid_attrs
+<%= for {ref, k, mod, _} <- schema.assocs do %>      <%= ref %> = <%= if schema.ex_machina_module do %><%= schema.ex_machina_module %>.insert(:<%= ref %>)<% else %>Repo.insert!(%<%= mod %>{})<% end %>
+      attrs = Map.merge(attrs, %{<%= k %>: <%= ref %>.id})
+<% end %>
+      assert {:ok, %<%= inspect schema.alias %>{} = <%= schema.singular %>} = <%= inspect context.alias %>.create_<%= schema.singular %>(attrs)<%= for {field, value} <- schema.params.create do %>
+      assert <%= schema.singular %>.<%= field %> == @valid_attrs.<%= field %><% end %>
     end
 
     test "create_<%= schema.singular %>/1 with invalid data returns error changeset" do
@@ -46,7 +50,7 @@
 <% else %>      <%= schema.singular %> = <%= schema.singular %>_fixture()
 <% end %>      assert {:ok, <%= schema.singular %>} = <%= inspect context.alias %>.update_<%= schema.singular %>(<%= schema.singular %>, @update_attrs)
       assert %<%= inspect schema.alias %>{} = <%= schema.singular %><%= for {field, value} <- schema.params.update do %>
-      assert <%= schema.singular %>.<%= field %> == <%= Mix.Phoenix.Schema.value(schema, field, value) %><% end %>
+      assert <%= schema.singular %>.<%= field %> == @update_attrs.<%= field %><% end %>
     end
 
     test "update_<%= schema.singular %>/2 with invalid data returns error changeset" do

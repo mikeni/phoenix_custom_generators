@@ -2,7 +2,11 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
   use <%= inspect context.web_module %>, :view
   use JaSerializer.PhoenixView
   
-  attributes [<%= (schema.types |> Enum.map(fn({k, v}) -> ":#{k}" end)) ++ [":inserted_at", ":updated_at"] |> Enum.join(", ") %>]
+  attributes [
+<%= for {k, v} <- schema.types do %>    :<%= k %>,
+<% end %>    :inserted_at,
+    :updated_at
+  ]  
   <%= for {ref, key, _, _} <- schema.assocs do %>
   has_one :<%= ref %>,
     field: :<%= key %>,
