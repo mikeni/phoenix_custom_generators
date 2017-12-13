@@ -63,7 +63,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
         "data" => %{
           "type" => "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>",
           "attributes" => dasherize_keys(@create_attrs),
-          "relationships" => relationships
+          "relationships" => relationships()
         }
       }
       assert %{"id" => id} = json_response(conn1, 201)["data"]
@@ -82,7 +82,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
         "data" => %{
           "type" => "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>",
           "attributes" => dasherize_keys(@invalid_attrs),
-          "relationships" => relationships
+          "relationships" => relationships()
         }
       }
       assert json_response(conn, 422)["errors"] != %{}
@@ -99,7 +99,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
           "type" => "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>",
           "id" => "#{<%= schema.singular %>.id}",
           "attributes" => dasherize_keys(@update_attrs),
-          "relationships" => relationships
+          "relationships" => relationships()
         }
       }
       data = json_response(conn1, 200)["data"]
@@ -123,7 +123,7 @@ defmodule <%= inspect context.web_module %>.<%= inspect Module.concat(schema.web
         "type" => "<%= JaSerializer.Formatter.Utils.format_key(schema.singular) %>",
         "id" => "#{<%= schema.singular %>.id}",
         "attributes" => dasherize_keys(@invalid_attrs),
-        "relationships" => relationships
+        "relationships" => relationships()
       }
     }
       assert json_response(conn, 422)["errors"] != %{}
