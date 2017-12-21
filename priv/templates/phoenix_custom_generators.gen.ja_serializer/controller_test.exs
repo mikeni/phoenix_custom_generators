@@ -6,7 +6,9 @@ defmodule <%= module %>ControllerTest do
     <%= k %>: <%= inspect v %>,<% end %>
   }
 
-  @invalid_attrs %{}
+  @invalid_attrs %{<%= for {k, v} <- params do %>
+    <%= k %>: nil,<% end %>
+  }
 
   setup %{conn: conn} do
     conn = conn
