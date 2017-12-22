@@ -9,8 +9,8 @@ defmodule <%= module %>Controller do
     render(conn, "index.json-api", data: <%= plural %>)
   end
 
-  def create(conn, %{<%= inspect singular %> => <%= singular %>_params}) do
-    changeset = <%= alias %>.changeset(%<%= alias %>{}, <%= singular %>_params)
+  def create(conn, %{"data" => data = %{"type" => <%= inspect JaSerializer.Formatter.Utils.format_key(singular) %>, "attributes" => _<%= singular %>_params}}) do
+    changeset = <%= alias %>.changeset(%<%= alias %>{}, Params.to_attributes(data))
 
     case Repo.insert(changeset) do
       {:ok, <%= singular %>} ->
@@ -30,9 +30,9 @@ defmodule <%= module %>Controller do
     render(conn, "show.json-api", data: <%= singular %>)
   end
 
-  def update(conn, %{"id" => id, <%= inspect singular %> => <%= singular %>_params}) do
+  def update(conn, %{"id" => id, "data" => data = %{"type" => <%= inspect JaSerializer.Formatter.Utils.format_key(singular) %>, "attributes" => _<%= singular %>_params}}) do
     <%= singular %> = Repo.get!(<%= alias %>, id)
-    changeset = <%= alias %>.changeset(<%= singular %>, <%= singular %>_params)
+    changeset = <%= alias %>.changeset(<%= singular %>, Params.to_attributes(data))
 
     case Repo.update(changeset) do
       {:ok, <%= singular %>} ->
