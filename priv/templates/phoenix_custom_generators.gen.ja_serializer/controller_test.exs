@@ -96,7 +96,7 @@ defmodule <%= module %>ControllerTest do
         "type" => "<%= JaSerializer.Formatter.Utils.format_key(singular) %>",
         "id" => <%= singular %>.id,
         "attributes" => @valid_attrs,
-        "relationships" => relationships
+        "relationships" => relationships()
       }
     }
     assert json_response(conn, 200)["data"]["id"]
@@ -111,7 +111,7 @@ defmodule <%= module %>ControllerTest do
         "type" => "<%= JaSerializer.Formatter.Utils.format_key(singular) %>",
         "id" => <%= singular %>.id,
         "attributes" => @invalid_attrs,
-        "relationships" => relationships
+        "relationships" => relationships()
       }
     }
     assert json_response(conn, 422)["errors"] != %{}

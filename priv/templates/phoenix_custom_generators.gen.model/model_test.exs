@@ -4,7 +4,8 @@ defmodule <%= module %>Test do
   alias <%= module %>
 
   @valid_attrs %{<%= for {k, v} <- params do %>
-    <%= k %>: <%= inspect v %>,<% end %>
+    <%= k %>: <%= inspect v %>,<% end %><%= for {_, k, _, _} <- assocs do %>
+    <%= k %>: 42,<% end %>
   }
   @invalid_attrs %{}
 
